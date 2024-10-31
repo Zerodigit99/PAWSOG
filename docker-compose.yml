@@ -1,0 +1,27 @@
+version: '3.8'  # Specify the Docker Compose version
+
+services:
+  bot:
+    build: .
+    container_name: paws_bot
+    volumes:
+      - ./sessions:/app/sessions  # Bind mount for session files
+    environment:
+      - PYTHONUNBUFFERED=1         # Ensure logs are flushed immediately
+      - TERM=xterm-256color         # Terminal type for better compatibility
+      - SESSION_ID=${SESSION_ID}    # Pass session ID from environment
+    ports:
+      - "7777:7777"                 # Map port 7777 on host to container
+    tty: true                       # Keep the terminal open
+    stdin_open: true                # Allow stdin to be open
+    restart: unless-stopped         # Restart policy
+    deploy:
+      restart_policy:
+        condition: on-failure       # Restart on failure
+    logging:
+      driver: "json-file"           # Logging driver
+      options:
+        max-size: "200k"            # Limit the log file size
+        max-file: "10"              # Keep a maximum of 10 log files
+    labels:
+      - "com.docker.compose.container-number=1"
